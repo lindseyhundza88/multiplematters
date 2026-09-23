@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiple Matters, One Entry – Practice</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #e8edf2;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    color: #333;
+    padding: 20px 16px 40px;
+  }
+
+  .page-header {
+    background: #1e4da1;
+    border-radius: 4px 4px 0 0;
+    padding: 11px 18px;
+    max-width: 860px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .page-header h1 { font-size: 14px; font-weight: 700; color: #fff; }
+  .page-header .badge { font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.18); color: #fff; padding: 3px 10px; border-radius: 10px; }
+
+  .page-sub {
+    background: #c8d8e8; border: 1px solid #a8b8cc;
+    border-top: none; border-radius: 0 0 4px 4px;
+    padding: 9px 18px; max-width: 860px;
+    font-size: 12px; color: #333; line-height: 1.5;
+    margin-bottom: 18px;
+  }
+
+  /* Scenario */
+  .scenario {
+    background: #fff8dc; border: 1px solid #e0c060;
+    border-radius: 4px; padding: 12px 16px;
+    max-width: 860px; margin-bottom: 16px;
+    font-size: 12px; color: #5a4000; line-height: 1.6;
+  }
+  .scenario strong { color: #3a2800; }
+  .scenario .matters-ref {
+    margin-top: 8px;
+    background: #fffef5; border: 1px solid #e8d870;
+    border-radius: 3px; padding: 7px 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px; color: #333; line-height: 1.9;
+  }
+  .scenario .format-tip {
+    margin-top: 8px; padding: 6px 10px;
+    background: #eef3fb; border: 1px solid #b0c4e8;
+    border-radius: 3px; font-size: 11px; color: #1a2a5a;
+  }
+
+  /* Progress */
+  .progress-wrap { max-width: 860px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .progress-bg { flex: 1; height: 6px; background: #ccc; border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #1e4da1; border-radius: 3px; transition: width 0.4s ease; }
+  .progress-label { font-size: 11px; color: #777; white-space: nowrap; }
+
+  /* Form */
+  .b4t-card { background: #fff; border: 1px solid #bbb; border-radius: 4px; max-width: 860px; overflow: hidden; margin-bottom: 14px; }
+  .form-topbar { background: #1e4da1; color: #fff; font-size: 13px; font-weight: 600; padding: 7px 14px; display: flex; justify-content: space-between; }
+  .form-topbar .timer { font-size: 11px; font-weight: 400; opacity: 0.85; }
+
+  .form-grid { padding: 10px 16px 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; border-bottom: 1px solid #ececec; }
+  .form-col { display: flex; flex-direction: column; }
+  .form-row { display: flex; align-items: center; padding: 4px 0; border-bottom: 1px solid #f4f4f4; min-height: 26px; gap: 8px; }
+  .form-row:last-child { border-bottom: none; }
+  .form-label { font-size: 11px; color: #666; width: 130px; flex-shrink: 0; text-align: right; padding-right: 8px; }
+  .form-label.required { color: #c03030; }
+  .f-static { font-size: 11px; color: #333; }
+  .f-input-display { display: inline-block; background: #f5f5f5; border: 1px solid #ccc; border-radius: 2px; padding: 2px 7px; font-size: 11px; color: #333; min-width: 120px; }
+  .f-input-display.blue { color: #1e4da1; font-weight: 600; background: #eef3fb; border-color: #b0c4e8; }
+
+  .f-select {
+    font-size: 11px; color: #333;
+    background: #f5f5f5; border: 1px solid #ccc;
+    border-radius: 2px; padding: 3px 8px;
+    min-width: 200px; cursor: pointer; outline: none;
+  }
+  .f-select:focus { border-color: #1e4da1; }
+  .f-select.correct { border-color: #60a860; background: #e8f5e8; color: #1a5a1a; }
+  .f-select.wrong   { border-color: #e05050; background: #fde8e8; color: #8a2020; }
+
+  /* Description */
+  .desc-section { padding: 10px 16px 8px; border-bottom: 1px solid #ececec; }
+  .desc-label-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 5px; gap: 10px; }
+  .desc-label { font-size: 11px; color: #666; }
+  .desc-hint { font-size: 10px; color: #1e4da1; font-style: italic; text-align: right; line-height: 1.4; max-width: 380px; }
+
+  .desc-textarea {
+    width: 100%; min-height: 120px;
+    background: #e8edf5; border: 1px solid #b0bcd0;
+    border-radius: 2px; padding: 8px 10px;
+    font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    color: #222; line-height: 1.65; resize: vertical; outline: none;
+  }
+  .desc-textarea:focus { border-color: #1e4da1; }
+  .desc-textarea.correct { border-color: #60a860; background: #f0faf0; }
+  .desc-textarea.wrong   { border-color: #e05050; background: #fff5f5; }
+
+  /* Time */
+  .form-time { padding: 8px 16px 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+
+  /* Feedback */
+  .feedback-box { display: none; margin: 0 16px 12px; padding: 9px 12px; border-radius: 3px; font-size: 12px; line-height: 1.6; }
+  .feedback-box.correct { background: #e8f5e8; border: 1px solid #80c080; color: #1a4a1a; }
+  .feedback-box.wrong   { background: #fde8e8; border: 1px solid #e08080; color: #6a1a1a; }
+  .feedback-box.partial { background: #fff8dc; border: 1px solid #e0c060; color: #5a4000; }
+
+  /* Buttons */
+  .form-buttons { background: #f0f0f0; border-top: 1px solid #ddd; padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .btn-row { display: flex; gap: 6px; }
+  .btn { font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 3px; border: 1px solid transparent; cursor: pointer; }
+  .btn-check  { background: #1e4da1; color: #fff; border-color: #1a3d80; }
+  .btn-check:hover { background: #1a3d80; }
+  .btn-reset  { background: #e8e8e8; color: #555; border-color: #bbb; }
+  .btn-grey   { background: #e8e8e8; color: #aaa; border-color: #ccc; cursor: default; }
+  .btn-cancel { background: #fff; color: #777; border-color: #ccc; cursor: default; }
+
+  .check-icon { color: #1a5a1a; font-weight: 700; margin-left: 4px; }
+
+  /* Complete */
+  .complete-card { display: none; background: #fff; border: 1px solid #bbb; border-radius: 4px; max-width: 860px; overflow: hidden; margin-top: 4px; }
+  .complete-top { background: #1a5a1a; color: #fff; font-size: 13px; font-weight: 700; padding: 10px 16px; }
+  .complete-body { padding: 16px 20px; font-size: 12px; color: #333; line-height: 1.6; }
+  .complete-body strong { color: #111; }
+  .model-answer { background: #f0faf0; border: 1px solid #80c080; border-radius: 3px; padding: 10px 14px; margin-top: 6px; font-size: 11.5px; font-family: 'Courier New', monospace; line-height: 1.9; color: #222; }
+  .complete-footer { background: #f0f0f0; border-top: 1px solid #ddd; padding: 8px 14px; display: flex; justify-content: flex-end; }
+  .btn-retry { font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 3px; border: 1px solid #bbb; background: #e8e8e8; color: #333; cursor: pointer; }
+  .btn-retry:hover { background: #ddd; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Practice Activity — Multiple Matters, One Entry</h1>
+  <span class="badge">Interactive</span>
+</div>
+<div class="page-sub">
+  Read the scenario carefully, then complete the Bill4Time form below. Select the correct activity code and write the full private description — including the task performed and each matter on its own line in Litify format.
+</div>
+
+<!-- Scenario -->
+<div class="scenario">
+  <strong>Scenario:</strong> This morning you spent 1.5 hours reviewing medical records for three different clients on the same tort. For each client, you reviewed records received from their treating physician, updated the Medical History tab in Litify, and drafted a medical record summary. Since you performed the <strong>exact same task</strong> for all three clients, you can log this as a single time entry.<br><br>
+  Use the information below to complete the form. Select the correct activity code, then write a clear private description that includes the task and all three matters.
+  <div class="matters-ref">
+    <strong>Task performed:</strong> Reviewed medical records, updated Medical History tab in Litify, drafted medical record summary<br>
+    <strong>Matter 1:</strong> SLS-2026-0441 – Hernandez, Maria – Electrostim MDI<br>
+    <strong>Matter 2:</strong> SLS-2026-0389 – Thompson, James – Electrostim MDI<br>
+    <strong>Matter 3:</strong> SLS-2026-0512 – Okonkwo, Blessing – Electrostim MDI<br>
+    <strong>Time:</strong> 9:00am – 10:30am
+  </div>
+  <div class="format-tip">
+    💡 <strong>Reminder — Litify display name format:</strong> [Matter Number] – [Client Name] – [Case Name] &nbsp;·&nbsp; List each matter on its own line in the description.
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="progress-bg"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <span class="progress-label" id="progressLabel">0 of 2 correct</span>
+</div>
+
+<!-- B4T Form -->
+<div class="b4t-card">
+  <div class="form-topbar">
+    New Time Entry
+    <span class="timer">▶ 00:00:00 ↺</span>
+  </div>
+
+  <div class="form-grid">
+    <div class="form-col">
+      <div class="form-row">
+        <div class="form-label">For User:</div>
+        <span class="f-input-display">Johnson, Sarah</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Client:</div>
+        <span class="f-input-display blue">Multiple</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Matter:</div>
+        <span class="f-input-display blue">Multiple</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label required">Activity: *</div>
+        <select class="f-select" id="activitySelect" onchange="checkActivity()">
+          <option value="">Select Activity</option>
+          <option value="medreq">SLS_Paralegal_006_Medical Record Request/Follow Up</option>
+          <option value="medrev">SLS_Paralegal_007_Medical Record Review</option>
+          <option value="cq">SLS_Paralegal_005_CQ Review</option>
+          <option value="audit">SLS_Paralegal_003_Case Audit</option>
+          <option value="clientcomm">SLS_Paralegal_002_Client Communication</option>
+        </select>
+        <span id="activityCheck" style="font-size:13px;margin-left:4px;"></span>
+      </div>
+    </div>
+    <div class="form-col">
+      <div class="form-row">
+        <div class="form-label">Entry Type:</div>
+        <span class="f-static">Hourly Work</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Overtime:</div>
+        <input type="checkbox" disabled>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Billable:</div>
+        <input type="checkbox" checked disabled>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Exclude From Invoice:</div>
+        <input type="checkbox" disabled>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Date Created:</div>
+        <span class="f-static" style="font-weight:600;">09/23/2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="desc-section">
+    <div class="desc-label-row">
+      <div class="desc-label">Private Description: <span style="color:#c03030;">*</span></div>
+      <div class="desc-hint">Include the task performed, then list each matter on its own line:<br>[Matter Number] – [Client Name] – [Case Name]</div>
+    </div>
+    <textarea class="desc-textarea" id="descField"
+      placeholder="Write your description here. Start with what you did, then list each matter on a new line using the Litify format…"
+      oninput="liveDescCheck()"></textarea>
+    <div style="display:flex;justify-content:space-between;margin-top:3px;">
+      <span id="descStatus" style="font-size:10px;color:#888;"></span>
+      <span id="charCount" style="font-size:10px;color:#aaa;">0 characters</span>
+    </div>
+    <div style="margin-top:6px;">
+      <label style="font-size:11px;color:#555;display:flex;align-items:center;gap:5px;">
+        <input type="checkbox" checked disabled style="accent-color:#1e4da1;"> Show private description on the invoice?
+      </label>
+    </div>
+  </div>
+
+  <!-- Time -->
+  <div class="form-time">
+    <div class="form-col">
+      <div class="form-row">
+        <div class="form-label">Date of Work:</div>
+        <span class="f-input-display">09/23/2026</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Start Time:</div>
+        <span class="f-input-display">9:00am</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label">End Time:</div>
+        <span class="f-input-display">10:30am</span>&nbsp;
+        <span style="font-size:10px;color:#1e4da1;cursor:default;">Get Time</span>
+      </div>
+    </div>
+    <div class="form-col">
+      <div class="form-row">
+        <div class="form-label">Labor Time (hrs):</div>
+        <span class="f-input-display">1.50</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Rate $:</div>
+        <span class="f-input-display">0.00</span>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Billable (hrs):</div>
+        <span class="f-input-display">1.50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="feedback-box" id="feedbackBox"></div>
+
+  <!-- Buttons -->
+  <div class="form-buttons">
+    <button class="btn btn-reset" onclick="resetForm()">Start Over</button>
+    <div class="btn-row">
+      <button class="btn btn-check" onclick="checkAll()">Check My Answer</button>
+      <button class="btn btn-grey" disabled>Save &amp; Close</button>
+      <button class="btn btn-grey" disabled>Save &amp; New</button>
+      <button class="btn btn-grey" disabled>Save &amp; Duplicate</button>
+      <button class="btn btn-cancel" disabled>Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Complete card -->
+<div class="complete-card" id="completeCard">
+  <div class="complete-top">✓ Well done — entry complete!</div>
+  <div class="complete-body">
+    <p>You correctly completed a multiple-matter entry. Here is a model answer:</p>
+    <br>
+    <p><strong>Activity:</strong> SLS_Paralegal_007_Medical Record Review</p>
+    <p style="margin-top:10px;"><strong>Private Description:</strong></p>
+    <div class="model-answer">
+      Reviewed medical records received from treating physician, updated Medical History tab in Litify, and drafted medical record summary for the following matters:<br>
+      SLS-2026-0441 – Hernandez, Maria – Electrostim MDI<br>
+      SLS-2026-0389 – Thompson, James – Electrostim MDI<br>
+      SLS-2026-0512 – Okonkwo, Blessing – Electrostim MDI
+    </div>
+    <br>
+    <p><strong>Key reminders:</strong></p>
+    <ul style="padding-left:16px;margin-top:4px;font-size:11.5px;line-height:1.8;">
+      <li>Same task for all three clients — one entry is acceptable.</li>
+      <li>Task description comes first, then each matter on its own line.</li>
+      <li>Each matter uses the Litify display name format: [Matter Number] – [Client Name] – [Case Name].</li>
+      <li>Description is clear, specific, and written as if a judge may read it.</li>
+    </ul>
+  </div>
+  <div class="complete-footer">
+    <button class="btn-retry" onclick="resetForm()">Try Again</button>
+  </div>
+</div>
+
+<script>
+  const CORRECT_ACTIVITY = 'medrev';
+
+  const REQUIRED_MATTERS = [
+    { num: 'SLS-2026-0441', name: 'Hernandez', case: 'Electrostim' },
+    { num: 'SLS-2026-0389', name: 'Thompson',  case: 'Electrostim' },
+    { num: 'SLS-2026-0512', name: 'Okonkwo',   case: 'Electrostim' }
+  ];
+
+  const DESC_TASK_KEYWORDS = ['medical record', 'medical records'];
+
+  function normalize(str) {
+    return str.toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  function descHasTask(val) {
+    const n = normalize(val);
+    return DESC_TASK_KEYWORDS.some(kw => n.includes(kw)) && val.length > 30;
+  }
+
+  function descHasMatters(val) {
+    const n = normalize(val);
+    return REQUIRED_MATTERS.every(m =>
+      n.includes(m.num.toLowerCase()) &&
+      n.includes(m.name.toLowerCase()) &&
+      n.includes(m.case.toLowerCase())
+    );
+  }
+
+  function descOk(val) {
+    return descHasTask(val) && descHasMatters(val);
+  }
+
+  function checkActivity() {
+    const sel = document.getElementById('activitySelect');
+    const chk = document.getElementById('activityCheck');
+    if (!sel.value) { chk.textContent = ''; sel.className = 'f-select'; return; }
+    if (sel.value === CORRECT_ACTIVITY) {
+      sel.className = 'f-select correct';
+      chk.innerHTML = '<span style="color:#1a5a1a;font-weight:700;">✓</span>';
+    } else {
+      sel.className = 'f-select wrong';
+      chk.innerHTML = '<span style="color:#c03030;font-weight:700;">✕</span>';
+    }
+    updateProgress();
+  }
+
+  function liveDescCheck() {
+    const val = document.getElementById('descField').value;
+    document.getElementById('charCount').textContent = val.length + ' characters';
+
+    const hasTask    = descHasTask(val);
+    const hasMatters = descHasMatters(val);
+    const status = document.getElementById('descStatus');
+
+    if (!val) { status.textContent = ''; return; }
+
+    if (hasTask && hasMatters) {
+      status.textContent = '✓ Task description and all three matters found';
+      status.style.color = '#1a5a1a';
+    } else if (hasTask && !hasMatters) {
+      const missing = REQUIRED_MATTERS.filter(m => !normalize(val).includes(m.num.toLowerCase()));
+      status.textContent = '⚠ Task found — still missing ' + missing.length + ' matter line(s)';
+      status.style.color = '#b06000';
+    } else {
+      status.textContent = '⚠ Add a description of the task performed';
+      status.style.color = '#b06000';
+    }
+
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const actOk = document.getElementById('activitySelect').value === CORRECT_ACTIVITY;
+    const dOk   = descOk(document.getElementById('descField').value);
+    const correct = [actOk, dOk].filter(Boolean).length;
+    const pct = (correct / 2) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = correct + ' of 2 correct';
+  }
+
+  function checkAll() {
+    const sel  = document.getElementById('activitySelect');
+    const desc = document.getElementById('descField').value;
+    const actOk = sel.value === CORRECT_ACTIVITY;
+    const dOk   = descOk(desc);
+    const hasTask    = descHasTask(desc);
+    const hasMatters = descHasMatters(desc);
+
+    // Style desc box
+    document.getElementById('descField').className = 'desc-textarea ' + (dOk ? 'correct' : 'wrong');
+
+    const fb = document.getElementById('feedbackBox');
+    fb.style.display = 'block';
+
+    if (actOk && dOk) {
+      fb.className = 'feedback-box correct';
+      fb.innerHTML = '<strong>✓ Perfect!</strong> Activity code and description are both correct — all three matters are included in the correct format.';
+      document.getElementById('completeCard').style.display = 'block';
+      document.getElementById('completeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      let issues = [];
+      if (!actOk) issues.push('Activity code is incorrect — you reviewed and summarized medical records, which maps to a specific code. Look at the scenario again carefully.');
+      if (!hasTask) issues.push('Description should describe the work performed — mention what you did with the medical records.');
+      else if (!hasMatters) {
+        const missing = REQUIRED_MATTERS.filter(m => !normalize(desc).includes(m.num.toLowerCase()));
+        issues.push('Description is missing ' + missing.length + ' matter line(s) — make sure all three are listed using the format: [Matter Number] – [Client Name] – [Case Name].');
+      }
+
+      const score = [actOk, dOk].filter(Boolean).length;
+      if (score === 1) {
+        fb.className = 'feedback-box partial';
+        fb.innerHTML = '<strong>Almost — 1 of 2 correct.</strong> Fix the following:<br>• ' + issues.join('<br>• ');
+      } else {
+        fb.className = 'feedback-box wrong';
+        fb.innerHTML = '<strong>✕ Not quite yet.</strong> Review the scenario and try again:<br>• ' + issues.join('<br>• ');
+      }
+    }
+
+    updateProgress();
+  }
+
+  function resetForm() {
+    document.getElementById('activitySelect').value = '';
+    document.getElementById('activitySelect').className = 'f-select';
+    document.getElementById('activityCheck').innerHTML = '';
+    document.getElementById('descField').value = '';
+    document.getElementById('descField').className = 'desc-textarea';
+    document.getElementById('charCount').textContent = '0 characters';
+    document.getElementById('descStatus').textContent = '';
+    document.getElementById('feedbackBox').style.display = 'none';
+    document.getElementById('completeCard').style.display = 'none';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressLabel').textContent = '0 of 2 correct';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
